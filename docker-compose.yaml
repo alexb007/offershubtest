@@ -58,3 +58,10 @@ services:
     networks:
       - front
       - back
+
+volumes:
+  redisdata:
+
+networks:
+  front:
+  back:
