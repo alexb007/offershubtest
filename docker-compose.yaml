@@ -9,7 +9,6 @@ services:
       - back
     volumes:
       - redisdata:/data
-      -
   nginx:
     restart: on-failure
     build:
