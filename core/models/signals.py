@@ -1,12 +1,12 @@
-from django.db.models.signals import post_save
+from django.contrib.auth import user_logged_in
 from django.dispatch import receiver
 
-from core.models import Project
+from ..tasks import populate_user_data
 
-
-@receiver(post_save, sender=Project)
-def save_project(sender, instance, created, **kwargs):
-    if created:
-        instance.remote_create()
-    else:
+def model_post_save(sender, instance, **kwargs):
+    if not instance.synced:
         instance.sync_remote()
+
+@receiver(user_logged_in)
+def user_logged(sender, user, request, **kwargs):
+    populate_user_data.delay()

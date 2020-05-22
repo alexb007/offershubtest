@@ -6,8 +6,6 @@ class Project(BaseApiHandler):
 
     def get_json_params(self, obj):
         return {
-            'data': {
-                "name": obj.name,
-                "owner": obj.owner.gid
-            }
+            "name": obj.name,
+            "workspace": obj.workspace.gid
         }

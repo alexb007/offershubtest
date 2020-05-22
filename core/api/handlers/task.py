@@ -1,5 +1,3 @@
-from django.apps import apps
-
 from core.api.handlers.base import BaseApiHandler
 
 
@@ -8,8 +6,8 @@ class Task(BaseApiHandler):
 
     def get_json_params(self, obj):
         return {
-            'data': {
-                "name": obj.name,
-                "projects": obj.projects.all().values_list('gid', flat=True),
-            }
+            "name": obj.name,
+            "assignee": obj.assignee.gid,
+            "projects": list(obj.projects.all().values_list('gid', flat=True)),
+            "notes": obj.notes,
         }

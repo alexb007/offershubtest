@@ -10,3 +10,9 @@ class User(BaseApiHandler):
                 "name": obj.name,
             }
         }
+
+    def getMe(self):
+        return self.action('me')
+
+    def getWorkspaces(self):
+        return self.client.workspaces.find_all()

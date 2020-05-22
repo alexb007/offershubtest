@@ -2,11 +2,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from core.models.base import BaseModel
+from core.tasks import sync_model
 
 
 class AsanaUser(BaseModel):
     gid = models.CharField(
-        max_length=128,  # TODO узнать максимальную длину для поля gid в asana
+        max_length=32,
         unique=True,
         null=True,
         editable=False,
@@ -16,6 +17,9 @@ class AsanaUser(BaseModel):
         max_length=512,
         verbose_name=_("Имя пользователя")
     )
+
+    def sync_remote(self):
+        return sync_model.delay(self.id, 'User')
 
     @property
     def resource_type(self):

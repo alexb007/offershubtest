@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class BaseModel(models.Model):
     synced = models.BooleanField(
         default=False,
+        editable=False,
         verbose_name=_('Синхронизировано')
     )
 

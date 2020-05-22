@@ -1,0 +1,61 @@
+version: '1'
+services:
+  redis:
+    container_name: crm_prod_redis
+    image: redis:4-alpine
+    env_file:
+      - .env
+    networks:
+      - back
+    volumes:
+      - redisdata:/data
+      -
+  nginx:
+    restart: on-failure
+    build:
+      context: ./nginx
+      dockerfile: ./Dockerfile
+    volumes:
+      - /static:/app/offershubtest/static
+      - /media:/app/offershubtest/media
+    networks:
+      - front
+      - back
+    ports:
+      - 9090:80
+    depends_on:
+      - project
+
+  project:
+    container_name: offershubtest
+    image: offershubtest
+    build: .
+    env_file:
+      - .env
+    command: 'python -Wd manage.py runserver 0.0.0.0:8000'
+    networks:
+      - front
+      - back
+    volumes:
+      - ./:/apps/offershubtest
+      - ./db_data/db.sqlite3:/db.sqlite3
+      - /static:/apps/offershubtest/static
+      - /media:/apps/offershubtest/media
+    links:
+      - redis
+    depends_on:
+      - redis
+    ports:
+      - 8000
+
+  celery:
+    build: .
+    command: celery -A offershubtest worker -l info
+    volumes:
+      - .:/apps/offershubtest
+    depends_on:
+      - project
+      - redis
+    networks:
+      - front
+      - back

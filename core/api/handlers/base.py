@@ -13,7 +13,6 @@ class BaseApiHandler:
         raise NotImplementedError('get_json_params method is not implemented!')
 
     def handle_response(self, response):
-        print(response)
         return response
 
     def action(self, method_name, *args, **kwargs):
@@ -22,14 +21,15 @@ class BaseApiHandler:
             raise Exception('Endpoint not defined!')
         endpoint = getattr(self.client, _endpoint)
         method = getattr(endpoint, method_name)
-        print(method)
         if method is None or not callable(method):
             raise Exception(f'{method_name} not found or not acceptable for this endpoint!')
+        print(f"args{args} {kwargs}")
         response = method(*args, **kwargs)
         return self.handle_response(response)
 
     def create(self, obj, **options):
         json_params = self.get_json_params(obj)
+        print(json_params)
         return self.action('create', params=json_params, options=options)
 
     def update(self, obj, **options):

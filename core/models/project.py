@@ -8,7 +8,7 @@ from core.tasks import sync_model
 
 class Project(BaseModel):
     gid = models.CharField(
-        max_length=128,  # TODO узнать максимальную длину для поля gid в asana
+        max_length=32,
         unique=True,
         null=True,
         editable=False,
@@ -18,13 +18,17 @@ class Project(BaseModel):
         max_length=512,
         verbose_name=_("Название проекта")
     )
+    workspace = models.ForeignKey(
+        'core.Workspace',
+        on_delete=models.CASCADE,
+        related_name='projects',
+        null=True,
+        verbose_name=_('Рабочее пространство')
+    )
 
     @property
     def resource_type(self):
         return 'project'
-
-    def remote_create(self):
-        return sync_model.delay(self.id, 'Project')
 
     def sync_remote(self):
         return sync_model.delay(self.id, 'Project')

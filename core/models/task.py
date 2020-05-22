@@ -2,11 +2,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from core.models.base import BaseModel
+from core.tasks import sync_model
 
 
 class Task(BaseModel):
     gid = models.CharField(
-        max_length=128,  # TODO узнать максимальную длину для поля gid в asana
+        max_length=32,
         unique=True,
         null=True,
         editable=False,
@@ -22,12 +23,6 @@ class Task(BaseModel):
         related_name='tasks',
         verbose_name=_('Исполнитель')
     )
-    completed_by = models.ForeignKey(
-        'core.AsanaUser',
-        on_delete=models.CASCADE,
-        related_name='completed_tasks',
-        verbose_name=_('Закончил')
-    )
     projects = models.ManyToManyField(
         'core.Project',
         related_name='tasks',
@@ -37,6 +32,9 @@ class Task(BaseModel):
         max_length=3000,
         verbose_name=_('Текст задачи')
     )
+
+    def sync_remote(self):
+        return sync_model.delay(self.id, 'Task')
 
     @property
     def resource_type(self):
